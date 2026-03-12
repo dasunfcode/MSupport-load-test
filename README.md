@@ -142,9 +142,3 @@ export const options = {
 ```
 
 ---
-
-This version includes **Chocolatey and K6 installation steps**, keeps cloning and running tests simple, and explains token usage clearly.
-
-If you want, I can **also add a tiny “new endpoint template” section** at the bottom so any developer can just copy-paste to load test a new API quickly.
-
-Do you want me to add that?
