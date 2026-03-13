@@ -14,18 +14,30 @@ export function handleSummary(data, testName = "Load Test Summary") {
     const failedReqs = data.metrics.http_req_failed?.values?.count ?? 0;
     const throughput = data.metrics.iterations?.values?.rate ?? 0;
 
-    // Sanitize testName for filename
-    const safeFileName = testName
+    // Extract script name from testName (handle file paths)
+    const scriptName = testName.includes('/') || testName.includes('\\') 
+        ? basename(testName).replace(/\.[^/.]+$/, '') 
+        : testName;
+
+    // Sanitize for filename
+    const safeFileName = scriptName
         .toLowerCase()
         .replace(/\s+/g, '_')
         .replace(/[^a-z0-9_]/g, '');
 
-    // Create timestamp (YYYY-MM-DD_HH-MM-SS)
-    const now = new Date();
-    const timestamp = now.toISOString()
-        .replace("T", "_")
-        .replace(/:/g, "-")
-        .split(".")[0];
+    // Determine filename: fixed for single test, timestamped for batch
+    let fileName;
+    if (__ENV.SINGLE_TEST) {
+        fileName = 'report.html';
+    } else {
+        // Create timestamp (YYYY-MM-DD_HH-MM-SS)
+        const now = new Date();
+        const timestamp = now.toISOString()
+            .replace("T", "_")
+            .replace(/:/g, "-")
+            .split(".")[0];
+        fileName = `${safeFileName}_${timestamp}.html`;
+    }
 
     // Build HTML
     const html = `
@@ -52,8 +64,10 @@ export function handleSummary(data, testName = "Load Test Summary") {
             <tr><td>Avg Response Time (ms)</td><td>${httpReq.avg?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Min Response Time (ms)</td><td>${httpReq.min?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Max Response Time (ms)</td><td>${httpReq.max?.toFixed(2) ?? 0}</td></tr>
+            <tr><td>p50 (ms)</td><td>${httpReq["p(50)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>p90 (ms)</td><td>${httpReq["p(90)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>p95 (ms)</td><td>${httpReq["p(95)"]?.toFixed(2) ?? 0}</td></tr>
+            <tr><td>p99 (ms)</td><td>${httpReq["p(99)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Throughput (req/sec)</td><td>${throughput?.toFixed(2) ?? 0}</td></tr>
         </table>
     </body>
@@ -61,5 +75,5 @@ export function handleSummary(data, testName = "Load Test Summary") {
     `;
 
     // Filename example: login_test_2026-03-13_08-41-22.html
-    return { [`${safeFileName}_${timestamp}.html`]: html };
+    return { [fileName]: html };
 }
