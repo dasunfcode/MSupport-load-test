@@ -14,30 +14,7 @@ export function handleSummary(data, testName = "Load Test Summary") {
     const failedReqs = data.metrics.http_req_failed?.values?.count ?? 0;
     const throughput = data.metrics.iterations?.values?.rate ?? 0;
 
-    // Extract script name from testName (handle file paths)
-    const scriptName = testName.includes('/') || testName.includes('\\') 
-        ? basename(testName).replace(/\.[^/.]+$/, '') 
-        : testName;
-
-    // Sanitize for filename
-    const safeFileName = scriptName
-        .toLowerCase()
-        .replace(/\s+/g, '_')
-        .replace(/[^a-z0-9_]/g, '');
-
-    // Determine filename: fixed for single test, timestamped for batch
-    let fileName;
-    if (__ENV.SINGLE_TEST) {
-        fileName = 'report.html';
-    } else {
-        // Create timestamp (YYYY-MM-DD_HH-MM-SS)
-        const now = new Date();
-        const timestamp = now.toISOString()
-            .replace("T", "_")
-            .replace(/:/g, "-")
-            .split(".")[0];
-        fileName = `${safeFileName}_${timestamp}.html`;
-    }
+    const fileName = __ENV.K6_REPORT_FILE || 'test.html';
 
     // Build HTML
     const html = `
@@ -70,25 +47,10 @@ export function handleSummary(data, testName = "Load Test Summary") {
             <tr><td>p99 (ms)</td><td>${httpReq["p(99)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Throughput (req/sec)</td><td>${throughput?.toFixed(2) ?? 0}</td></tr>
         </table>
-        <div style="text-align: center; margin: 20px;">
-            <button onclick="downloadReport()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Report</button>
-        </div>
-        <script>
-            function downloadReport() {
-                const html = document.documentElement.outerHTML;
-                const blob = new Blob([html], {type: 'text/html'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = '${fileName}';
-                a.click();
-                URL.revokeObjectURL(url);
-            }
-        </script>
     </body>
     </html>
     `;
 
-    // Filename example: login_test_2026-03-13_08-41-22.html
+    // Return HTML to file
     return { [fileName]: html };
 }
