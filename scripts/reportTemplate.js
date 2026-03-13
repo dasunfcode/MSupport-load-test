@@ -14,8 +14,13 @@ export function handleSummary(data, testName = "Load Test Summary") {
     const failedReqs = data.metrics.http_req_failed?.values?.count ?? 0;
     const throughput = data.metrics.iterations?.values?.rate ?? 0;
 
-    // Sanitize testName for filename
-    const safeFileName = testName
+    // Extract script name from testName (handle file paths)
+    const scriptName = testName.includes('/') || testName.includes('\\') 
+        ? basename(testName).replace(/\.[^/.]+$/, '') 
+        : testName;
+
+    // Sanitize for filename
+    const safeFileName = scriptName
         .toLowerCase()
         .replace(/\s+/g, '_')
         .replace(/[^a-z0-9_]/g, '');
