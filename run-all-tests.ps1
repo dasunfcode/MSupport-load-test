@@ -137,6 +137,21 @@ foreach ($file in $reportFiles) {
 }
 
 $combinedHtml += @"
+    <div style="text-align: center; margin: 20px;">
+        <button onclick="downloadReport()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Report</button>
+    </div>
+    <script>
+        function downloadReport() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'combined-report.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
 </body>
 </html>
 "@

@@ -70,6 +70,21 @@ export function handleSummary(data, testName = "Load Test Summary") {
             <tr><td>p99 (ms)</td><td>${httpReq["p(99)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Throughput (req/sec)</td><td>${throughput?.toFixed(2) ?? 0}</td></tr>
         </table>
+        <div style="text-align: center; margin: 20px;">
+            <button onclick="downloadReport()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Report</button>
+        </div>
+        <script>
+            function downloadReport() {
+                const html = document.documentElement.outerHTML;
+                const blob = new Blob([html], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '${fileName}';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        </script>
     </body>
     </html>
     `;
