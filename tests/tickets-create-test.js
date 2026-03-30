@@ -29,7 +29,7 @@ export default function (data) {
     const token = tokens[__VU % tokens.length];
 
     const payload = JSON.stringify({
-        name: "test",
+        name: "Yooo",
         description: "test",
         type: "problem",
         assetSerialNumber: "MPRDEV1",

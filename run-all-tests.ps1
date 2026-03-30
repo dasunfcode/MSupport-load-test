@@ -1,8 +1,9 @@
 $testFiles = @(
-    "tests\create-tickets-test.js",
+    "tests\users-login-test.js",
     "tests\organizations-search-test.js",
-    "tests\search-tickets-test.js",
-    "tests\update-tickets-status-test.js",
+    "tests\tickets-create-test.js",
+    "tests\tickets-search-test.js",
+    "tests\tickets-update-status-test.js",
     "tests\assets-search-test.js",
     "tests\assets-get-by-id-test.js",
     "tests\assets-maintenances-test.js",
