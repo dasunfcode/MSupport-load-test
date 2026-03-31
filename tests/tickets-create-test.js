@@ -59,11 +59,14 @@ export default function (data) {
         'ticket created successfully': (r) => r.status === 201
     });
 
+    console.log(res.body);
+
     // Random think time: 1-3 seconds to simulate realistic user behavior
     sleep(Math.random() * 2 + 1);
 }
 
 export function handleSummary(data) {
     // Pass a custom test name to the template
+    console.log(data);
     return summaryTemplate(data, "Create Tickets API");
 }
